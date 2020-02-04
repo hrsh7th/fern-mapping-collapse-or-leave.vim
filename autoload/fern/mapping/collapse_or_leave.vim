@@ -6,7 +6,7 @@ function! fern#mapping#collapse_or_leave#init(disable_default_mappings) abort
     return
   endif
 
-  nmap <buffer><silent> <Plug>(fern-action-collapse-or-leave) :<C-u>call <SID>call('collapse_or_leave')<CR>
+  nmap <buffer><silent><expr> <Plug>(fern-action-collapse-or-leave) <SID>mapping()
 
   if !g:fern#mapping#collapse_or_leave#disable_default_mappings && !a:disable_default_mappings
     nmap <buffer><silent> h <Plug>(fern-action-collapse-or-leave)
@@ -14,29 +14,23 @@ function! fern#mapping#collapse_or_leave#init(disable_default_mappings) abort
 endfunction
 
 "
-" call
-"
-function! s:call(name) abort
-  call fern#internal#mapping#call(function('s:mapping'))
-endfunction
-
-"
 " mapping
 "
-function! s:mapping(helper) abort
-  if a:helper.sync.get_scheme() !=# 'file'
-    return
+function! s:mapping() abort
+  let l:helper = fern#helper#new()
+  if l:helper.sync.get_scheme() !=# 'file'
+    return ''
   endif
 
-  let l:root_node = a:helper.sync.get_root_node()
-  let l:cursor_node = a:helper.sync.get_cursor_node()
+  let l:root_node = l:helper.sync.get_root_node()
+  let l:cursor_node = l:helper.sync.get_cursor_node()
 
   let l:is_under_root = len(l:root_node.__key) + 1 == len(l:cursor_node.__key)
-  let l:is_leaf_or_collapsed = index([g:fern#internal#node#STATUS_NONE, g:fern#internal#node#STATUS_COLLAPSED], l:cursor_node.status) >= 0
+  let l:is_leaf_or_collapsed = index([l:helper.STATUS_NONE, l:helper.STATUS_COLLAPSED], l:cursor_node.status) >= 0
   if l:is_under_root && l:is_leaf_or_collapsed
-    call feedkeys("\<Plug>(fern-action-leave)")
+    return "\<Plug>(fern-action-leave)"
   else
-    call feedkeys("\<Plug>(fern-action-collapse)")
+    return "\<Plug>(fern-action-collapse)"
   endif
 endfunction
 
