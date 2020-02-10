@@ -27,7 +27,7 @@ function! s:mapping() abort
 
   let l:is_root = len(l:cursor_node.__key) == len(l:root_node.__key)
   let l:is_under_root = len(l:cursor_node.__key) - 1 <= len(l:root_node.__key)
-  let l:is_leaf_or_collapsed = index([l:helper.STATUS_NONE, l:helper.STATUS_COLLAPSED], l:cursor_node.status) >= 0
+  let l:is_leaf_or_collapsed = index([g:fern#STATUS_NONE, g:fern#STATUS_COLLAPSED], l:cursor_node.status) >= 0
   if l:is_root || (l:is_under_root && l:is_leaf_or_collapsed)
     return "\<Plug>(fern-action-leave)"
   else
